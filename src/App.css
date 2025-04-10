@@ -1,50 +1,83 @@
-/* App.css */
-.navbar {
-  width: 100%;
-  background-color: var(--nav-color);
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
+/* src/App.css */
+
+body {
+  margin: 0;
+  background-color: #1a1a1a;
+  color: #f1f1f1;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.navbar a {
-  color: var(--text-color);
-  text-decoration: none;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.navbar a:hover {
-  color: var(--highlight);
-}
-
-.container {
+.App {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #f8f8f8;
+}
+
+.nav-link {
+  color: #ccc;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 150px; /* space under navbar */
-  padding-left: 20px;
-  padding-right: 20px;
   text-align: center;
+  padding: 60px 20px;
 }
 
-.container h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: var(--text-color);
+.slogan {
+  font-size: 2.8rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #fdfdfd;
 }
 
-.container p {
-  font-size: 1.3rem;
-  max-width: 700px;
-  color: #c1c1c1;
-  line-height: 1.6;
+.slogan span {
+  display: block;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.slogan span:nth-child(1) {
+  animation-delay: 0.3s;
+}
+.slogan span:nth-child(2) {
+  animation-delay: 1s;
+}
+.slogan span:nth-child(3) {
+  animation-delay: 1.7s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -1,18 +1,22 @@
+// src/App.jsx
 import './App.css';
 
 function App() {
   return (
-    <>
+    <div className="App">
       <nav className="navbar">
-        <a href="#">Support</a>
+        <div className="logo">Win The Day</div>
+        <a href="#" className="nav-link">Support</a>
       </nav>
-      <main className="container">
-        <h1>Win The Day</h1>
-        <p>
-          Win today. Repeat. Become unstoppable.
-        </p>
+
+      <main className="main-content">
+        <h1 className="slogan">
+          <span>Win today.</span>
+          <span>Repeat.</span>
+          <span>Become unstoppable.</span>
+        </h1>
       </main>
-    </>
+    </div>
   );
 }
 
