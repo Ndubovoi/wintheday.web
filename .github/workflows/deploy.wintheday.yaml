@@ -19,7 +19,7 @@ jobs:
               id: build_wintheday
               run: |
                 IMAGE=localhost:30084/wintheday:${{ github.sha }}
-                docker build --push --tag $IMAGE -f ./wintheday/Dockerfile ./wintheday
+                docker build --push --tag $IMAGE
                 echo "$IMAGE" > wintheday-image.txt
             - name: Upload image tag
               uses: actions/upload-artifact@v4
