@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wintheday
+  name: wintheday
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wintheday
+  template:
+    metadata:
+      labels:
+        app: wintheday
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+      - image: $WINTHEDAY_IMAGE
+        imagePullPolicy: Always
+        name: wintheday
+        ports:
+        - containerPort: 80

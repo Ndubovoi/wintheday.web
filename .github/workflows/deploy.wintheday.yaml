@@ -1,0 +1,61 @@
+name: wintheday
+"on":
+    workflow_dispatch: {}
+env:
+    DEPLOYMENT_MANIFEST_PATH: |
+        ./kubernetes/deployments/wintheday.yaml
+jobs:
+    buildImage:
+        permissions:
+            contents: read
+            id-token: write
+        runs-on: self-hosted
+        steps:
+            - uses: actions/checkout@v3
+            - name: Check arch
+              run: |
+                uname -a
+            - name: Build and push wintheday Docker image
+              id: build_wintheday
+              run: |
+                IMAGE=localhost:30084/wintheday:${{ github.sha }}
+                docker build --push --tag $IMAGE -f ./wintheday/Dockerfile ./wintheday
+                echo "$IMAGE" > wintheday-image.txt
+            - name: Upload image tag
+              uses: actions/upload-artifact@v4
+              with:
+                name: wintheday-image-tag
+                path: wintheday-image.txt
+                retention-days: 1
+
+    deploy:
+        permissions:
+            contents: read
+            id-token: write
+        runs-on: self-hosted
+        needs:
+            - buildImage
+        steps:
+            - uses: actions/checkout@v3
+            - name: Download image tag
+              uses: actions/download-artifact@v4
+              with:
+                name: wintheday-image-tag
+            - name: Set WINTHEDAY_IMAGE
+              run: |
+                export WINTHEDAY_IMAGE=$(cat wintheday-image.txt)
+                echo "WINTHEDAY_IMAGE=$WINTHEDAY_IMAGE" >> $GITHUB_ENV
+            - name: Set up K3s context
+              run: |
+                mkdir -p ~/.kube
+                sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+                sudo chmod 644 ~/.kube/config
+            - name: Deploy to K3s
+              run: |
+                sudo chmod 644 ./kubernetes/services/wintheday.yaml
+                sudo chmod 644 ./kubernetes/deployments/wintheday.yaml
+                sed -i 's|\$LANDING_PAGE_IMAGE|'"${{ env.LANDING_PAGE_IMAGE }}"'|g' ./kubernetes/deployments/wintheday.yaml
+                sed -i 's|\$LANDING_PAGE_IMAGE|'"${{ env.LANDING_PAGE_IMAGE }}"'|g' ./kubernetes/services/wintheday.yaml
+                sudo cat ./kubernetes/deployments/wintheday.yaml
+                sudo cat ./kubernetes/services/wintheday.yaml
+                sudo kubectl apply -f ${{ env.DEPLOYMENT_MANIFEST_PATH }}

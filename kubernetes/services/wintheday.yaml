@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: wintheday
+  namespace: default
+spec:
+  selector:
+    app: wintheday
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30086  # 🔹 Manually set a fixed port
+  type: NodePort
