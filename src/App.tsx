@@ -5,7 +5,7 @@ function App() {
   const aboutRef = useRef<HTMLElement>(null);
   const supportRef = useRef<HTMLElement>(null);
 
-  const scrollTo = (ref: React.RefObject<HTMLElement>) => {
+  const scrollTo = (ref: React.RefObject<HTMLElement | null>) => {
     if (ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth' });
     }
