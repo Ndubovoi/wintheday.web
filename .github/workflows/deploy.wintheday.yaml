@@ -4,7 +4,6 @@ name: wintheday
 env:
     DEPLOYMENT_MANIFEST_PATH: |
         ./kubernetes/deployments/wintheday.yaml
-        ./kubernetes/services/wintheday.yaml
 jobs:
     buildImage:
         permissions:
