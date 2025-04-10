@@ -10,11 +10,14 @@ function App() {
       </nav>
 
       <main className="main-content">
-        <h1 className="slogan">
-          <span>Win today.</span>
-          <span>Repeat.</span>
-          <span>Become unstoppable.</span>
-        </h1>
+        <div className="left-section">
+          <h1 className="hero-title">Win The Day</h1>
+          <div className="slogan-inline">
+            <span className="fade-word" style={{ animationDelay: "0.3s" }}>Win&nbsp;today.</span>
+            <span className="fade-word" style={{ animationDelay: "1.0s" }}>Repeat.</span>
+            <span className="fade-word" style={{ animationDelay: "1.7s" }}>Become&nbsp;unstoppable.</span>
+          </div>
+        </div>
       </main>
     </div>
   );
