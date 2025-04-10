@@ -1,40 +1,54 @@
-# Win The Day
+# React + TypeScript + Vite
 
-## Win today. Repeat. Become unstoppable.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-**Win The Day** is a minimalist app designed to help you build momentum, track consistency, and celebrate small daily victories.
+Currently, two official plugins are available:
 
-Every day, you answer one simple question:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-> **Did you win today?**
+## Expanding the ESLint configuration
 
-Whether it's crushing a workout, getting out of bed early, finishing a task, or simply showing up for yourself—this app keeps your streak alive and your focus sharp.
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
----
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
 
-## Why It Works
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-- ✅ Reflect on your day in just one tap  
-- 📊 See your win streak and stay accountable  
-- 🌱 Build momentum through small daily wins  
-- 🧠 Prioritize consistency over perfection  
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-> Real progress is built one honest day at a time.
-
----
-
-## Coming Soon
-
-- 📝 Task list for goal-oriented tracking  
-- 🌐 Cross-platform sync with iOS, Android, and Web
-
----
-
-## Support
-
-Need help or want to share feedback?  
-📬 Contact us at: **support@win-the-day.com*
-
----
-
-_Made with focus, discipline, and cold showers._
+export default tseslint.config({
+  plugins: {
+    // Add the react-x and react-dom plugins
+    'react-x': reactX,
+    'react-dom': reactDom,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended typescript rules
+    ...reactX.configs['recommended-typescript'].rules,
+    ...reactDom.configs.recommended.rules,
+  },
+})
+```

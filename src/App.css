@@ -1,0 +1,50 @@
+/* App.css */
+.navbar {
+  width: 100%;
+  background-color: var(--nav-color);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.navbar a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+  color: var(--highlight);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 150px; /* space under navbar */
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: center;
+}
+
+.container h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.container p {
+  font-size: 1.3rem;
+  max-width: 700px;
+  color: #c1c1c1;
+  line-height: 1.6;
+}
