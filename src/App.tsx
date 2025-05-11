@@ -29,12 +29,9 @@ function App() {
             <span className="fade-word">Repeat.</span>
             <span className="fade-word">Become unstoppable.</span>
           </div>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <footer className="footer-link">
+        </div>
+      </main>
+          <footer className="footer-link fade-word">
             <a
               href="https://apps.apple.com/app/6743326409"
               target="_blank"
@@ -47,8 +44,6 @@ function App() {
               />
             </a>
           </footer>
-        </div>
-      </main>
 
       <section className="info-section about" ref={aboutRef}>
         <h2>About</h2>

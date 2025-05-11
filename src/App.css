@@ -5,6 +5,14 @@
   box-sizing: border-box;
 }
 
+.footer-link {
+  position: fixed;
+  bottom: 32px; /* adjust this to move it up/down */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
 body, html, #root {
   height: 100%;
   font-family: 'Inter', sans-serif;
