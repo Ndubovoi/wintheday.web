@@ -29,6 +29,24 @@ function App() {
             <span className="fade-word">Repeat.</span>
             <span className="fade-word">Become unstoppable.</span>
           </div>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <footer className="footer-link">
+            <a
+              href="https://apps.apple.com/app/6743326409"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="/download_apple.svg"
+                alt="Download on the App Store"
+                style={{ height: '48px' }}
+              />
+            </a>
+          </footer>
         </div>
       </main>
 
