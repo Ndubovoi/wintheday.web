@@ -19,7 +19,7 @@ jobs:
               run: |
                 IMAGE=localhost:30084/wintheday:${{ github.sha }}
                 buildah bud --platform linux/amd64 -t "$IMAGE" .
-                buildah push "$IMAGE"
+                buildah push --tls-verify=false "$IMAGE"
               env:
                 BUILDAH_ISOLATION: chroot
             - name: Upload image tag
