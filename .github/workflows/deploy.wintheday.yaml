@@ -4,7 +4,6 @@ name: wintheday
 env:
     DEPLOYMENT_MANIFEST_PATH: |
         ./kubernetes/deployments/wintheday.yaml
-        ./kubernetes/services/wintheday.yaml
 jobs:
     buildImage:
         permissions:
@@ -52,4 +51,4 @@ jobs:
               run: |
                 sed -i 's|\$WINTHEDAY_IMAGE|'"${{ env.WINTHEDAY_IMAGE }}"'|g' ./kubernetes/deployments/wintheday.yaml
                 sed -i 's|\$WINTHEDAY_IMAGE|'"${{ env.WINTHEDAY_IMAGE }}"'|g' ./kubernetes/services/wintheday.yaml
-                sudo kubectl apply -f ${{ env.DEPLOYMENT_MANIFEST_PATH }}
+                kubectl apply -f ./kubernetes/services/wintheday.yaml -f ./kubernetes/deployments/wintheday.yaml
