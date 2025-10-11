@@ -15,12 +15,13 @@ jobs:
             - name: Check arch
               run: |
                 uname -a
-            - name: Build and push wintheday Docker image
-              id: build_wintheday
+            - name: Build and push (no Docker)
               run: |
                 IMAGE=localhost:30084/wintheday:${{ github.sha }}
-                docker build --push --tag $IMAGE .
-                echo "$IMAGE" > wintheday-image.txt
+                buildah bud --platform linux/amd64 -t "$IMAGE" .
+                buildah push "$IMAGE"
+              env:
+                BUILDAH_ISOLATION: chroot
             - name: Upload image tag
               uses: actions/upload-artifact@v4
               with:
