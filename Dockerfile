@@ -14,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # Use nginx to serve the build output
-FROM nginx:latest
+FROM docker.io/library/nginx:1.27-alpine
 
 # Copy the build output to the nginx html directory
 COPY --from=build /app/dist /usr/share/nginx/html
