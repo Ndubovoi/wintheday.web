@@ -3,7 +3,8 @@ import { format } from 'date-fns';
 import { addDaysStr, mondayOf, todayStr, parseDateStr } from '../../domain/dates';
 import { useStreaks } from '../streaks/useStreaks';
 import StreakBadges from '../streaks/StreakBadges';
-import DayColumn from './DayColumn';
+import SelectedDayHero from './SelectedDayHero';
+import DayCard from './DayCard';
 
 export default function WeekView() {
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayStr()));
@@ -14,7 +15,6 @@ export default function WeekView() {
   const weekEnd = days[6];
   const isCurrentWeek = weekStart === mondayOf(todayStr());
 
-  // When changing week, focus its first day (or today if it's that week).
   function goToWeek(newStart: string) {
     setWeekStart(newStart);
     const thisWeek = mondayOf(todayStr());
@@ -27,7 +27,7 @@ export default function WeekView() {
   )}`;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
@@ -47,9 +47,9 @@ export default function WeekView() {
             </button>
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-wtd-text">
+            <h2 className="text-lg font-semibold tracking-tight text-wtd-text">
               {isCurrentWeek ? 'This week' : 'Week'}
-            </h1>
+            </h2>
             <p className="text-xs font-medium uppercase tracking-widest text-wtd-muted">
               {rangeLabel}
             </p>
@@ -66,10 +66,13 @@ export default function WeekView() {
         <StreakBadges dayStreak={dayStreak} weekStreak={weekStreak} />
       </header>
 
-      {/* Horizontal week board: 7 day rectangles across the full width. */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+      {/* Hero: the selected day's circle + task management */}
+      <SelectedDayHero date={selected} />
+
+      {/* Week strip: faded day cards at the bottom; hover to preview, click to select */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7 lg:items-start">
         {days.map((date) => (
-          <DayColumn
+          <DayCard
             key={date}
             date={date}
             selected={date === selected}

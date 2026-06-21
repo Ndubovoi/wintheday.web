@@ -18,7 +18,7 @@ import {
 import { getRecurring, addRecurring } from '../../data/recurring.repo';
 import { updateWinStatusForDate } from '../../data/winStatus';
 
-export function useDay(date: string) {
+export function useDay(date: string, materialize = true) {
   const { user } = useAuth();
   const uid = user?.uid;
   const [tasks, setTasks] = useState<TaskItem[]>([]);
@@ -46,7 +46,7 @@ export function useDay(date: string) {
 
   // Lazily materialize recurring instances for strictly-future days (once per day).
   useEffect(() => {
-    if (!uid || materializedFor.current === `${uid}:${date}`) return;
+    if (!uid || !materialize || materializedFor.current === `${uid}:${date}`) return;
     materializedFor.current = `${uid}:${date}`;
     (async () => {
       const recurring = await getRecurring(uid);
