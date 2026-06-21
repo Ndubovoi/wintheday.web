@@ -33,7 +33,7 @@ export default function SettingsScreen() {
   }
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-6">
+    <div className="mx-auto max-w-2xl">
       <h1 className="mb-6 text-2xl font-semibold text-wtd-text">Settings</h1>
 
       <Section title="Winning goals">

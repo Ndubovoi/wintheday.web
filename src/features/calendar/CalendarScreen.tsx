@@ -25,7 +25,7 @@ export default function CalendarScreen() {
   const winsThisMonth = days.filter((d) => results[toDateStr(d)] === true).length;
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-6">
+    <div className="mx-auto max-w-2xl">
       <header className="mb-5 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-wtd-text">History</h1>
         <StreakBadges dayStreak={dayStreak} weekStreak={weekStreak} />

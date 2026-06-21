@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import './LandingPage.css';
 
 function LandingPage() {
@@ -18,6 +19,7 @@ function LandingPage() {
         <div className="nav-links">
           <button className="nav-button" onClick={() => scrollTo(aboutRef)}>About</button>
           <button className="nav-button" onClick={() => scrollTo(supportRef)}>Support</button>
+          <Link className="login-button" to="/app">Log in</Link>
         </div>
       </nav>
 
