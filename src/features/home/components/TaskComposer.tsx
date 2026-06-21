@@ -3,9 +3,11 @@ import { useState } from 'react';
 export interface TaskComposerProps {
   onAdd: (name: string, winBreaker: boolean) => Promise<void> | void;
   onAddRecurring: (name: string, rule: 'daily' | 'workDays', winBreaker: boolean) => Promise<void> | void;
+  /** Stack the input above the button for narrow columns. */
+  compact?: boolean;
 }
 
-export default function TaskComposer({ onAdd, onAddRecurring }: TaskComposerProps) {
+export default function TaskComposer({ onAdd, onAddRecurring, compact = false }: TaskComposerProps) {
   const [name, setName] = useState('');
   const [winBreaker, setWinBreaker] = useState(false);
   const [recurring, setRecurring] = useState(false);
@@ -24,17 +26,19 @@ export default function TaskComposer({ onAdd, onAddRecurring }: TaskComposerProp
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
-      <div className="flex gap-2">
+      <div className={compact ? 'flex flex-col gap-2' : 'flex gap-2'}>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Add a task…"
-          className="flex-1 rounded-lg border border-wtd-border bg-wtd-surface px-3 py-2.5 text-wtd-text placeholder:text-wtd-muted focus:border-wtd-teal-accent focus:outline-none"
+          className="min-w-0 flex-1 rounded-lg border border-wtd-border bg-wtd-surface px-3 py-2.5 text-wtd-text placeholder:text-wtd-muted focus:border-wtd-teal-accent focus:outline-none"
         />
         <button
           type="submit"
           disabled={!name.trim()}
-          className="rounded-lg bg-wtd-teal px-5 py-2.5 font-semibold text-wtd-bg transition-opacity disabled:opacity-40"
+          className={`rounded-lg bg-wtd-teal py-2.5 font-semibold text-wtd-bg transition-opacity disabled:opacity-40 ${
+            compact ? 'px-3' : 'px-5'
+          }`}
         >
           Add
         </button>

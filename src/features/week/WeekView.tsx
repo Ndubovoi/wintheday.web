@@ -3,24 +3,23 @@ import { format } from 'date-fns';
 import { addDaysStr, mondayOf, todayStr, parseDateStr } from '../../domain/dates';
 import { useStreaks } from '../streaks/useStreaks';
 import StreakBadges from '../streaks/StreakBadges';
-import DayPanel from './DayPanel';
+import DayColumn from './DayColumn';
 
 export default function WeekView() {
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayStr()));
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set([todayStr()]));
+  const [selected, setSelected] = useState(() => todayStr());
   const { dayStreak, weekStreak } = useStreaks();
 
   const days = Array.from({ length: 7 }, (_, i) => addDaysStr(weekStart, i));
   const weekEnd = days[6];
   const isCurrentWeek = weekStart === mondayOf(todayStr());
 
-  const toggle = (date: string) =>
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(date)) next.delete(date);
-      else next.add(date);
-      return next;
-    });
+  // When changing week, focus its first day (or today if it's that week).
+  function goToWeek(newStart: string) {
+    setWeekStart(newStart);
+    const thisWeek = mondayOf(todayStr());
+    setSelected(newStart === thisWeek ? todayStr() : newStart);
+  }
 
   const rangeLabel = `${format(parseDateStr(weekStart), 'MMM d')} – ${format(
     parseDateStr(weekEnd),
@@ -33,14 +32,14 @@ export default function WeekView() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setWeekStart((w) => addDaysStr(w, -7))}
+              onClick={() => goToWeek(addDaysStr(weekStart, -7))}
               className="rounded-lg px-2 py-1 text-wtd-muted hover:bg-wtd-surface-2 hover:text-wtd-text"
               aria-label="Previous week"
             >
               ‹
             </button>
             <button
-              onClick={() => setWeekStart((w) => addDaysStr(w, 7))}
+              onClick={() => goToWeek(addDaysStr(weekStart, 7))}
               className="rounded-lg px-2 py-1 text-wtd-muted hover:bg-wtd-surface-2 hover:text-wtd-text"
               aria-label="Next week"
             >
@@ -57,7 +56,7 @@ export default function WeekView() {
           </div>
           {!isCurrentWeek && (
             <button
-              onClick={() => setWeekStart(mondayOf(todayStr()))}
+              onClick={() => goToWeek(mondayOf(todayStr()))}
               className="rounded-lg border border-wtd-border px-3 py-1.5 text-xs text-wtd-muted hover:border-wtd-teal-accent/40 hover:text-wtd-text"
             >
               This week
@@ -67,13 +66,14 @@ export default function WeekView() {
         <StreakBadges dayStreak={dayStreak} weekStreak={weekStreak} />
       </header>
 
-      <div className="flex flex-col gap-3">
+      {/* Horizontal week board: 7 day rectangles across the full width. */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
         {days.map((date) => (
-          <DayPanel
+          <DayColumn
             key={date}
             date={date}
-            expanded={expanded.has(date)}
-            onToggle={() => toggle(date)}
+            selected={date === selected}
+            onSelect={() => setSelected(date)}
           />
         ))}
       </div>

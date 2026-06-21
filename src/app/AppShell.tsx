@@ -15,7 +15,7 @@ export default function AppShell() {
   return (
     <div className="flex min-h-screen flex-col bg-wtd-bg font-sans text-wtd-text">
       <nav className="sticky top-0 z-20 border-b border-wtd-border bg-wtd-bg/85 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-8">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-8">
           <div className="flex items-center gap-6">
             <span className="text-lg font-bold tracking-tight">Win The Day</span>
             <div className="flex items-center gap-1">
@@ -47,7 +47,7 @@ export default function AppShell() {
       </nav>
 
       <main className="flex flex-1 justify-center px-4 py-8 sm:px-8">
-        <div className="w-full max-w-6xl">
+        <div className="w-full max-w-7xl">
           <Outlet />
         </div>
       </main>
