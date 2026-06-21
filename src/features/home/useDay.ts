@@ -25,7 +25,6 @@ import {
   deleteSeriesInstancesFrom,
 } from '../../data/recurring.repo';
 import { updateWinStatusForDate } from '../../data/winStatus';
-import { celebrate } from '../../shared/confetti';
 
 export function useDay(date: string) {
   const { user } = useAuth();
@@ -34,6 +33,9 @@ export function useDay(date: string) {
   const [recurring, setRecurring] = useState<RecurringTaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // The date whose data `realTasks` currently reflects. Lets consumers know the
+  // derived `won` belongs to the requested `date` (not a stale previous day).
+  const [loadedDate, setLoadedDate] = useState('');
 
   useEffect(() => {
     if (!uid) return;
@@ -43,6 +45,7 @@ export function useDay(date: string) {
       date,
       (t) => {
         setRealTasks(t);
+        setLoadedDate(date);
         setLoading(false);
       },
       (e) => {
@@ -132,12 +135,11 @@ export function useDay(date: string) {
 
   async function toggle(task: TaskItem) {
     if (!uid) return;
-    const wasWon = won;
     if (task.virtual) await materialize(task, !task.completed);
     else await setTaskCompleted(uid, task.id, !task.completed);
-    const nowWon = await recompute();
-    // Celebrate only when checking a task off actually wins the day.
-    if (!wasWon && nowWon) celebrate();
+    await recompute();
+    // Confetti is fired reactively (see SelectedDayHero) when the day flips to
+    // won — covers both this toggle and a completion synced from another device.
   }
 
   /** Remove from this day only. For a recurring task, record a skip date. */
@@ -177,6 +179,7 @@ export function useDay(date: string) {
     openWinBreakers,
     won,
     total,
+    loadedDate,
     isToday: date === todayStr(),
     add,
     addRecurringTask,
