@@ -10,6 +10,8 @@ export interface ProgressCircleProps {
   total: number;
   openWinBreakers: number;
   size?: number;
+  /** Hide the centered status text — use for small summary rings. */
+  showText?: boolean;
 }
 
 export default function ProgressCircle({
@@ -17,6 +19,7 @@ export default function ProgressCircle({
   total,
   openWinBreakers,
   size = 260,
+  showText = true,
 }: ProgressCircleProps) {
   const fill = total === 0 ? 0 : completed / total;
   const tasksLeftToWin = Math.max(0, Math.ceil(total * WIN_THRESHOLD) - completed);
@@ -111,14 +114,16 @@ export default function ProgressCircle({
         />
       </svg>
 
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
-        {total > 0 && (
-          <span className="mb-1 text-3xl font-bold text-white drop-shadow">
-            {completed}/{total}
-          </span>
-        )}
-        <span className="text-sm font-medium text-white drop-shadow">{statusText}</span>
-      </div>
+      {showText && (
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+          {total > 0 && (
+            <span className="mb-1 text-3xl font-bold text-white drop-shadow">
+              {completed}/{total}
+            </span>
+          )}
+          <span className="text-sm font-medium text-white drop-shadow">{statusText}</span>
+        </div>
+      )}
     </div>
   );
 }

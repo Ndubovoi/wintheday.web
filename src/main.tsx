@@ -19,7 +19,7 @@ import { AuthProvider } from './auth/AuthProvider';
 import { RequireAuth } from './auth/RequireAuth';
 import AppShell from './app/AppShell';
 import LoginScreen from './app/LoginScreen';
-import HomeScreen from './features/home/HomeScreen';
+import WeekView from './features/week/WeekView';
 import CalendarScreen from './features/calendar/CalendarScreen';
 import SettingsScreen from './features/settings/SettingsScreen';
 
@@ -46,7 +46,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 </RequireAuth>
               }
             >
-              <Route index element={<HomeScreen />} />
+              <Route index element={<WeekView />} />
               <Route path="calendar" element={<CalendarScreen />} />
               <Route path="settings" element={<SettingsScreen />} />
             </Route>
