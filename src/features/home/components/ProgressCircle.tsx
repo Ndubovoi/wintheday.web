@@ -29,7 +29,6 @@ export default function ProgressCircle({
   // Fill rises from the bottom: translate a full-height fill group downward by
   // the empty fraction. y=0 (top) … y=200 (bottom) in the 200x200 viewBox.
   const emptyOffset = (1 - fill) * 200;
-  const thresholdY = (1 - WIN_THRESHOLD) * 200;
 
   const statusText =
     total === 0
@@ -87,20 +86,6 @@ export default function ProgressCircle({
               />
             </path>
           </g>
-
-          {/* 80% threshold marker */}
-          {total > 0 && (
-            <line
-              x1="6"
-              y1={thresholdY}
-              x2="194"
-              y2={thresholdY}
-              stroke="#64ffda"
-              strokeWidth="1.5"
-              strokeDasharray="5 5"
-              opacity="0.7"
-            />
-          )}
         </g>
 
         {/* ring */}

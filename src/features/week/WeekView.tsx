@@ -1,15 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { addDaysStr, mondayOf, todayStr, parseDateStr } from '../../domain/dates';
+import { useAuth } from '../../auth/useAuth';
+import { subscribeRecurring, stopRecurring } from '../../data/recurring.repo';
+import type { RecurringTaskItem } from '../../domain/types';
 import { useStreaks } from '../streaks/useStreaks';
 import StreakBadges from '../streaks/StreakBadges';
 import SelectedDayHero from './SelectedDayHero';
 import DayCard from './DayCard';
+import RecurringTasksPanel from './RecurringTasksPanel';
 
 export default function WeekView() {
+  const { user } = useAuth();
   const [weekStart, setWeekStart] = useState(() => mondayOf(todayStr()));
   const [selected, setSelected] = useState(() => todayStr());
+  const [recurring, setRecurring] = useState<RecurringTaskItem[]>([]);
   const { dayStreak, weekStreak } = useStreaks();
+
+  useEffect(() => {
+    if (!user) return;
+    return subscribeRecurring(user.uid, setRecurring);
+  }, [user]);
+
+  const hasRecurring = recurring.length > 0;
 
   const days = Array.from({ length: 7 }, (_, i) => addDaysStr(weekStart, i));
   const weekEnd = days[6];
@@ -66,8 +79,16 @@ export default function WeekView() {
         <StreakBadges dayStreak={dayStreak} weekStreak={weekStreak} />
       </header>
 
-      {/* Hero: the selected day's circle + task management */}
-      <SelectedDayHero date={selected} />
+      {/* Hero + (optional) recurring-tasks side panel */}
+      <div className={hasRecurring ? 'grid gap-6 lg:grid-cols-[1fr_300px]' : ''}>
+        <SelectedDayHero date={selected} />
+        {hasRecurring && (
+          <RecurringTasksPanel
+            items={recurring}
+            onRemove={(id) => user && stopRecurring(user.uid, id)}
+          />
+        )}
+      </div>
 
       {/* Week strip: faded day cards at the bottom; hover to preview, click to select */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7 lg:items-start">

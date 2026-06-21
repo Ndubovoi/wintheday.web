@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../auth/useAuth';
 import { getCustomization, saveCustomization } from '../../data/customization.repo';
-import { subscribeRecurring, softDeleteRecurring } from '../../data/recurring.repo';
-import { DEFAULT_CUSTOMIZATION, type RecurringTaskItem } from '../../domain/types';
+import { DEFAULT_CUSTOMIZATION } from '../../domain/types';
 
 export default function SettingsScreen() {
   const { user } = useAuth();
@@ -10,7 +9,6 @@ export default function SettingsScreen() {
 
   const [daysToWinWeek, setDaysToWinWeek] = useState(DEFAULT_CUSTOMIZATION.daysToWinWeek);
   const [weeksToWinYear, setWeeksToWinYear] = useState(DEFAULT_CUSTOMIZATION.weeksToWinYear);
-  const [recurring, setRecurring] = useState<RecurringTaskItem[]>([]);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -20,7 +18,6 @@ export default function SettingsScreen() {
       setDaysToWinWeek(c.daysToWinWeek);
       setWeeksToWinYear(c.weeksToWinYear);
     });
-    return subscribeRecurring(uid, setRecurring);
   }, [uid]);
 
   async function save() {
@@ -70,38 +67,6 @@ export default function SettingsScreen() {
           </button>
           {saved && <span className="text-sm text-wtd-win">Saved ✓</span>}
         </div>
-      </Section>
-
-      <Section title="Recurring tasks">
-        {recurring.length === 0 ? (
-          <p className="text-sm text-wtd-muted">
-            No recurring tasks. Create one from the home screen with the “Recurring” option.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {recurring.map((r) => (
-              <li
-                key={r.id}
-                className="flex items-center justify-between rounded-lg border border-wtd-border bg-wtd-surface-2 px-3 py-2"
-              >
-                <span className="text-wtd-text">
-                  {r.name}
-                  <span className="ml-2 text-xs text-wtd-muted">
-                    {r.recurrenceRule === 'daily' ? 'Daily' : 'Work days'}
-                    {r.winBreaker ? ' · win-breaker' : ''}
-                  </span>
-                </span>
-                <button
-                  onClick={() => uid && softDeleteRecurring(uid, r.id)}
-                  className="text-sm text-wtd-muted hover:text-wtd-loss"
-                  aria-label={`Delete recurring task ${r.name}`}
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
       </Section>
 
       <Section title="Reminders">

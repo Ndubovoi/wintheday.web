@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { fromRecurringDoc, toRecurringDoc } from './converters';
+import { todayStr } from '../domain/dates';
 import type { RecurringTaskItem } from '../domain/types';
 
 const col = (uid: string) => collection(db, 'users', uid, 'recurring_tasklist');
@@ -69,4 +70,10 @@ export async function deleteSeriesInstancesFrom(
       .filter((d) => (d.data().date as string) >= fromDate)
       .map((d) => deleteDoc(d.ref)),
   );
+}
+
+/** Stop a recurring series: soft-delete the template + remove today/future instances. */
+export async function stopRecurring(uid: string, recurringId: string): Promise<void> {
+  await softDeleteRecurring(uid, recurringId);
+  await deleteSeriesInstancesFrom(uid, recurringId, todayStr());
 }
