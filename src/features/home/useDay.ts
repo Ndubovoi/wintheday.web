@@ -1,12 +1,13 @@
-// State + actions for a single selected day. Live subscription to that day's
-// tasks, lazy materialization of recurring instances for future days (mirrors
-// TaskItemRepository.getTasksForDate), and mutations that recompute win status.
-import { useEffect, useMemo, useRef, useState } from 'react';
+// State + actions for a single selected day. Subscribes to that day's stored
+// tasks AND the recurring templates, then merges them for display: a recurring
+// task shows on every day it applies to (today onward) as a "virtual" occurrence
+// that is written to Firestore only when the user interacts with it.
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../auth/useAuth';
 import { addDaysStr, todayStr } from '../../domain/dates';
 import { isDayWon } from '../../domain/winDay';
-import { recurringInstancesForDate } from '../../domain/recurrence';
-import type { TaskItem } from '../../domain/types';
+import { displayTasksForDate } from '../../domain/recurrence';
+import type { TaskItem, RecurringTaskItem } from '../../domain/types';
 import {
   subscribeTasksForDate,
   getTasksForDate,
@@ -16,6 +17,7 @@ import {
   saveTask,
 } from '../../data/tasks.repo';
 import {
+  subscribeRecurring,
   getRecurring,
   addRecurring,
   addSkipDate,
@@ -24,13 +26,13 @@ import {
 } from '../../data/recurring.repo';
 import { updateWinStatusForDate } from '../../data/winStatus';
 
-export function useDay(date: string, materialize = true) {
+export function useDay(date: string) {
   const { user } = useAuth();
   const uid = user?.uid;
-  const [tasks, setTasks] = useState<TaskItem[]>([]);
+  const [realTasks, setRealTasks] = useState<TaskItem[]>([]);
+  const [recurring, setRecurring] = useState<RecurringTaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const materializedFor = useRef<string>('');
 
   useEffect(() => {
     if (!uid) return;
@@ -39,7 +41,7 @@ export function useDay(date: string, materialize = true) {
       uid,
       date,
       (t) => {
-        setTasks(t.sort((a, b) => a.createdOn.localeCompare(b.createdOn) || a.name.localeCompare(b.name)));
+        setRealTasks(t);
         setLoading(false);
       },
       (e) => {
@@ -50,45 +52,49 @@ export function useDay(date: string, materialize = true) {
     return unsub;
   }, [uid, date]);
 
-  // Lazily materialize recurring instances for strictly-future days (once per day).
   useEffect(() => {
-    if (!uid || !materialize || materializedFor.current === `${uid}:${date}`) return;
-    materializedFor.current = `${uid}:${date}`;
-    (async () => {
-      const recurring = await getRecurring(uid);
-      if (recurring.length === 0) return;
-      const existing = await getTasksForDate(uid, date);
-      const existingIds = new Set(existing.map((t) => t.recurringId).filter(Boolean) as string[]);
-      const instances = recurringInstancesForDate(recurring, date, existingIds);
-      for (const inst of instances) {
-        await addTask(uid, {
-          name: inst.name,
-          completed: false,
-          date,
-          createdOn: date,
-          isRecurring: true,
-          recurringId: inst.recurringId,
-          winBreaker: inst.winBreaker,
-          x: 0,
-          y: 0,
-        });
-      }
-      if (instances.length > 0) await recompute();
-    })().catch((e) => setError(e instanceof Error ? e.message : String(e)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid, date]);
+    if (!uid) return;
+    return subscribeRecurring(uid, setRecurring);
+  }, [uid]);
+
+  // Stored tasks + virtual recurring occurrences, sorted stably.
+  const tasks = useMemo(
+    () =>
+      displayTasksForDate(realTasks, recurring, date).sort(
+        (a, b) => a.createdOn.localeCompare(b.createdOn) || a.name.localeCompare(b.name),
+      ),
+    [realTasks, recurring, date],
+  );
 
   const completed = useMemo(() => tasks.filter((t) => t.completed).length, [tasks]);
+  const total = tasks.length;
   const openWinBreakers = useMemo(
     () => tasks.filter((t) => !t.completed && t.winBreaker).length,
     [tasks],
   );
   const won = useMemo(() => isDayWon(tasks), [tasks]);
 
+  // Recompute win status over the merged list (so virtual occurrences count too).
   async function recompute() {
     if (!uid) return;
-    const latest = await getTasksForDate(uid, date);
-    await updateWinStatusForDate(uid, date, latest);
+    const [real, recs] = await Promise.all([getTasksForDate(uid, date), getRecurring(uid)]);
+    await updateWinStatusForDate(uid, date, displayTasksForDate(real, recs, date));
+  }
+
+  /** Write a virtual recurring occurrence to Firestore so it can hold state. */
+  async function materialize(task: TaskItem, completedState: boolean): Promise<void> {
+    if (!uid) return;
+    await addTask(uid, {
+      name: task.name,
+      completed: completedState,
+      date,
+      createdOn: date,
+      isRecurring: true,
+      recurringId: task.recurringId ?? null,
+      winBreaker: task.winBreaker,
+      x: 0,
+      y: 0,
+    });
   }
 
   async function add(name: string, winBreaker = false) {
@@ -107,46 +113,34 @@ export function useDay(date: string, materialize = true) {
     await recompute();
   }
 
-  /** Create a recurring template and materialize an instance for today if it applies. */
-  async function addRecurringTask(
-    name: string,
-    rule: 'daily' | 'workDays',
-    winBreaker = false,
-  ) {
+  /** Create a recurring template (it then shows on every applicable day automatically). */
+  async function addRecurringTask(name: string, rule: 'daily' | 'workDays', winBreaker = false) {
     if (!uid || !name.trim()) return;
-    const recurringId = await addRecurring(uid, {
+    await addRecurring(uid, {
       name: name.trim(),
       recurrenceRule: rule,
       recurrenceDetails: null,
       isDeleted: false,
       winBreaker,
     });
-    await addTask(uid, {
-      name: name.trim(),
-      completed: false,
-      date,
-      createdOn: date,
-      isRecurring: true,
-      recurringId,
-      winBreaker,
-      x: 0,
-      y: 0,
-    });
     await recompute();
   }
 
   async function toggle(task: TaskItem) {
     if (!uid) return;
-    await setTaskCompleted(uid, task.id, !task.completed);
+    if (task.virtual) await materialize(task, !task.completed);
+    else await setTaskCompleted(uid, task.id, !task.completed);
     await recompute();
   }
 
+  /** Remove from this day only. For a recurring task, record a skip date. */
   async function remove(task: TaskItem) {
     if (!uid) return;
-    await deleteTask(uid, task.id);
-    // For a recurring instance, record a skip so it isn't re-materialized on reload.
-    if (task.isRecurring && task.recurringId) {
+    if (task.recurringId) {
       await addSkipDate(uid, task.recurringId, date);
+      if (!task.virtual) await deleteTask(uid, task.id);
+    } else {
+      await deleteTask(uid, task.id);
     }
     await recompute();
   }
@@ -156,15 +150,15 @@ export function useDay(date: string, materialize = true) {
     if (!uid || !task.recurringId) return;
     await softDeleteRecurring(uid, task.recurringId);
     await deleteSeriesInstancesFrom(uid, task.recurringId, todayStr());
-    await deleteTask(uid, task.id); // covers a past/selected instance before today
+    if (!task.virtual) await deleteTask(uid, task.id);
     await recompute();
   }
 
+  /** Move a one-off task to tomorrow (recurring tasks don't expose this). */
   async function moveToTomorrow(task: TaskItem) {
-    if (!uid) return;
-    const tomorrow = addDaysStr(date, 1);
-    await saveTask(uid, { ...task, date: tomorrow, completed: false });
-    await recompute(); // recompute the day it left; tomorrow recomputes on visit
+    if (!uid || task.recurringId) return;
+    await saveTask(uid, { ...task, date: addDaysStr(date, 1), completed: false });
+    await recompute();
   }
 
   return {
@@ -175,6 +169,7 @@ export function useDay(date: string, materialize = true) {
     completed,
     openWinBreakers,
     won,
+    total,
     isToday: date === todayStr(),
     add,
     addRecurringTask,

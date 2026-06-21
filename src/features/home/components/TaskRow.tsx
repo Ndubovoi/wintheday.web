@@ -40,14 +40,16 @@ export default function TaskRow({
         )}
       </span>
       <div className="flex items-center gap-1">
-        <button
-          onClick={onMoveToTomorrow}
-          title="Move to tomorrow"
-          aria-label={`Move ${task.name} to tomorrow`}
-          className="rounded px-1.5 py-0.5 text-wtd-muted hover:text-wtd-teal-accent"
-        >
-          →
-        </button>
+        {!task.isRecurring && (
+          <button
+            onClick={onMoveToTomorrow}
+            title="Move to tomorrow"
+            aria-label={`Move ${task.name} to tomorrow`}
+            className="rounded px-1.5 py-0.5 text-wtd-muted hover:text-wtd-teal-accent"
+          >
+            →
+          </button>
+        )}
         <button
           onClick={onRemove}
           title={task.isRecurring ? 'Remove from this day' : 'Delete'}

@@ -21,6 +21,11 @@ export interface TaskItem {
   /** Canvas coordinates for the bubble board (mobile parity). */
   x: number;
   y: number;
+  /**
+   * True for a recurring occurrence shown for display but not yet written to
+   * Firestore. Materialized into a real doc on first interaction. Not persisted.
+   */
+  virtual?: boolean;
 }
 
 export interface RecurringTaskItem {

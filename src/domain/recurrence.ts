@@ -3,8 +3,13 @@
 //
 // Only two rules exist in the app: 'daily' and 'workDays' (Mon–Fri). This is NOT
 // a general RRULE engine — keep it to these two cases to stay in sync with mobile.
-import type { RecurrenceRule } from './types';
-import { isWeekday, isLaterThanToday } from './dates';
+import type { RecurrenceRule, TaskItem } from './types';
+import { isWeekday, isLaterThanToday, todayStr } from './dates';
+
+/** Whether a recurrence rule applies on a given date (daily, or workDays on Mon–Fri). */
+export function ruleAppliesOn(rule: RecurrenceRule, dateStr: string): boolean {
+  return rule === 'daily' || (rule === 'workDays' && isWeekday(dateStr));
+}
 
 export interface RecurringSpec {
   id: string;
@@ -46,12 +51,53 @@ export function recurringInstancesForDate(
   for (const r of recurring) {
     if (r.isDeleted) continue;
     if (r.skipDates?.includes(dateStr)) continue;
-    const applies =
-      r.recurrenceRule === 'daily' ||
-      (r.recurrenceRule === 'workDays' && isWeekday(dateStr));
-    if (!applies) continue;
+    if (!ruleAppliesOn(r.recurrenceRule, dateStr)) continue;
     if (existingRecurringIds.has(r.id)) continue;
     out.push({ recurringId: r.id, name: r.name, winBreaker: r.winBreaker });
   }
   return out;
+}
+
+/**
+ * The full task list to DISPLAY for a day: the real (stored) tasks plus virtual
+ * occurrences for every recurring template that applies to the day but has no
+ * stored task yet. Virtual occurrences are flagged `virtual: true` and are
+ * materialized into real docs only when the user interacts with them.
+ *
+ * Recurrence is shown from today onward — past days show only their stored tasks
+ * (a recurring task you added today was never "due" on a past day).
+ */
+export function displayTasksForDate(
+  realTasks: TaskItem[],
+  recurring: RecurringSpec[],
+  dateStr: string,
+  now: Date = new Date(),
+): TaskItem[] {
+  if (dateStr < todayStr(now)) return realTasks;
+
+  const present = new Set(
+    realTasks.map((t) => t.recurringId).filter(Boolean) as string[],
+  );
+
+  const virtuals: TaskItem[] = [];
+  for (const r of recurring) {
+    if (r.isDeleted) continue;
+    if (r.skipDates?.includes(dateStr)) continue;
+    if (!ruleAppliesOn(r.recurrenceRule, dateStr)) continue;
+    if (present.has(r.id)) continue;
+    virtuals.push({
+      id: `virtual:${r.id}:${dateStr}`,
+      name: r.name,
+      completed: false,
+      date: dateStr,
+      createdOn: dateStr,
+      isRecurring: true,
+      recurringId: r.id,
+      winBreaker: r.winBreaker,
+      x: 0,
+      y: 0,
+      virtual: true,
+    });
+  }
+  return [...realTasks, ...virtuals];
 }

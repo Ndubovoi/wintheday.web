@@ -13,7 +13,7 @@ export default function DayCard({
   selected: boolean;
   onSelect: () => void;
 }) {
-  const day = useDay(date, false); // read-only preview; the hero materializes recurring tasks
+  const day = useDay(date);
   const dt = parseDateStr(date);
   const today = todayStr();
   const isToday = date === today;
