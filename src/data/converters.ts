@@ -108,7 +108,8 @@ export function fromRecurringDoc(id: string, data: Raw): RecurringTaskItem {
   };
 }
 
-export function toRecurringDoc(item: Omit<RecurringTaskItem, 'id'>): Raw {
+/** createdOn is stamped here (Timestamp), so callers omit it. */
+export function toRecurringDoc(item: Omit<RecurringTaskItem, 'id' | 'createdOn'>): Raw {
   return {
     name: item.name,
     recurrenceRule: RULE_TO_STRING[item.recurrenceRule],
