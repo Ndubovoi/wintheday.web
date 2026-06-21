@@ -1,0 +1,35 @@
+/* Tailwind v4 + Win The Day consumer dark theme.
+ * Scoped to the authenticated /app area; the marketing pages keep their own CSS.
+ * Palette mirrors the Flutter app (ThemeData.dark + per-widget accents):
+ *  - backgrounds #121212 / surfaces #1E1E1E / #2D2D2D
+ *  - tealAccent ring + glow on the hero circle
+ *  - deep-orange "lava" fill for progress. */
+@import "tailwindcss";
+
+@theme {
+  --color-wtd-bg: #121212;
+  --color-wtd-surface: #1e1e1e;
+  --color-wtd-surface-2: #2d2d2d;
+  --color-wtd-border: #2a2a2a;
+  --color-wtd-text: #f5f5f5;
+  --color-wtd-muted: #9e9e9e;
+
+  --color-wtd-teal: #00ffaa;
+  --color-wtd-teal-accent: #64ffda;
+  --color-wtd-cyan: #66ccff;
+  --color-wtd-lava: #ff6e40;
+  --color-wtd-lava-deep: #ff3d00;
+  --color-wtd-win: #4caf50;
+  --color-wtd-loss: #ef5350;
+  --color-wtd-flame: #ff9100;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Subtle teal glow used by the hero progress circle. */
+@utility glow-teal {
+  box-shadow: 0 0 16px 4px rgb(0 255 170 / 0.25);
+}
+@utility glow-teal-strong {
+  box-shadow: 0 0 24px 6px rgb(100 255 218 / 0.45);
+}

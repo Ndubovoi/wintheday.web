@@ -1,5 +1,8 @@
-/* === GLOBAL RESET === */
-* {
+/* === RESET (scoped to the marketing landing subtree) ===
+   Must NOT be global: an unlayered `* { margin:0 }` overrides Tailwind's
+   layered utilities in the /app area (e.g. mx-auto, padding). */
+.App,
+.App * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -47,7 +50,23 @@ body, html, #root {
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: 20px;
+}
+
+.login-button {
+  background-color: #00ffaa;
+  color: #121212;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.login-button:hover {
+  opacity: 0.85;
 }
 
 .nav-button {

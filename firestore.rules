@@ -1,0 +1,28 @@
+rules_version = '2';
+
+// Local-emulator rules that encode the intended per-user isolation. These are
+// for local development/testing; the production rules live in the Firebase
+// console and must be audited separately before launch (see the plan's risks).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // All per-user data lives under users/{uid}/**
+    match /users/{uid}/{document=**} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Customization is a top-level collection keyed by uid.
+    match /customizations/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Motivational messages are global, read-only to signed-in users.
+    match /motivational_messages/{id} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}

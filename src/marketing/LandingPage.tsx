@@ -1,7 +1,8 @@
 import { useRef } from 'react';
-import './App.css';
+import { Link } from 'react-router-dom';
+import './LandingPage.css';
 
-function App() {
+function LandingPage() {
   const aboutRef = useRef<HTMLElement>(null);
   const supportRef = useRef<HTMLElement>(null);
 
@@ -18,6 +19,7 @@ function App() {
         <div className="nav-links">
           <button className="nav-button" onClick={() => scrollTo(aboutRef)}>About</button>
           <button className="nav-button" onClick={() => scrollTo(supportRef)}>Support</button>
+          <Link className="login-button" to="/app">Log in</Link>
         </div>
       </nav>
 
@@ -64,4 +66,4 @@ function App() {
   );
 }
 
-export default App;
+export default LandingPage;
