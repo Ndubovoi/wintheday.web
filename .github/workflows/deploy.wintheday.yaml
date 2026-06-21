@@ -1,11 +1,23 @@
 name: wintheday
+
+# Deploy on merge/push to main — but only after build + tests pass (the `test`
+# job reuses the CI workflow as a gate). Manual runs still allowed.
 "on":
+    push:
+        branches:
+            - main
     workflow_dispatch: {}
 env:
-    DEPLOYMENT_MANIFEST_PATH: |
-        ./kubernetes/deployments/wintheday.yaml
+    DEPLOYMENT_MANIFEST_PATH: ./kubernetes/deployments/wintheday.yaml
 jobs:
+    test:
+        permissions:
+            contents: read
+        uses: ./.github/workflows/ci.yml
+
     buildImage:
+        needs:
+            - test
         permissions:
             contents: read
             id-token: write
