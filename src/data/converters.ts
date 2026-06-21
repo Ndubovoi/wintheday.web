@@ -105,6 +105,7 @@ export function fromRecurringDoc(id: string, data: Raw): RecurringTaskItem {
     createdOn: toDayString(data.createdOn),
     isDeleted: asBool(data.isDeleted),
     winBreaker: asBool(data.winBreaker),
+    skipDates: Array.isArray(data.skipDates) ? (data.skipDates as string[]) : [],
   };
 }
 

@@ -35,6 +35,13 @@ describe('recurringInstancesForDate', () => {
     expect(recurringInstancesForDate([deleted], '2026-06-18', NONE, now)).toEqual([]);
   });
 
+  it('skips dates listed in skipDates (removed-from-this-day)', () => {
+    const withSkip = { ...daily, skipDates: ['2026-06-18'] };
+    expect(recurringInstancesForDate([withSkip], '2026-06-18', NONE, now)).toEqual([]);
+    // but still applies on other days
+    expect(recurringInstancesForDate([withSkip], '2026-06-19', NONE, now).map((i) => i.recurringId)).toEqual(['d1']);
+  });
+
   it('carries name and winBreaker into the instance', () => {
     const [inst] = recurringInstancesForDate([work], '2026-06-18', NONE, now);
     expect(inst).toEqual({ recurringId: 'w1', name: 'Standup', winBreaker: true });

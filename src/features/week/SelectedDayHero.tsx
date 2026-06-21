@@ -68,6 +68,7 @@ export default function SelectedDayHero({ date }: { date: string }) {
                   task={task}
                   onToggle={() => day.toggle(task)}
                   onRemove={() => day.remove(task)}
+                  onRemoveSeries={() => day.removeSeries(task)}
                   onMoveToTomorrow={() => day.moveToTomorrow(task)}
                 />
               ))}

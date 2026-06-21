@@ -15,7 +15,13 @@ import {
   deleteTask,
   saveTask,
 } from '../../data/tasks.repo';
-import { getRecurring, addRecurring } from '../../data/recurring.repo';
+import {
+  getRecurring,
+  addRecurring,
+  addSkipDate,
+  softDeleteRecurring,
+  deleteSeriesInstancesFrom,
+} from '../../data/recurring.repo';
 import { updateWinStatusForDate } from '../../data/winStatus';
 
 export function useDay(date: string, materialize = true) {
@@ -138,6 +144,19 @@ export function useDay(date: string, materialize = true) {
   async function remove(task: TaskItem) {
     if (!uid) return;
     await deleteTask(uid, task.id);
+    // For a recurring instance, record a skip so it isn't re-materialized on reload.
+    if (task.isRecurring && task.recurringId) {
+      await addSkipDate(uid, task.recurringId, date);
+    }
+    await recompute();
+  }
+
+  /** Remove the whole recurring series: stop repeating + delete today/future instances. */
+  async function removeSeries(task: TaskItem) {
+    if (!uid || !task.recurringId) return;
+    await softDeleteRecurring(uid, task.recurringId);
+    await deleteSeriesInstancesFrom(uid, task.recurringId, todayStr());
+    await deleteTask(uid, task.id); // covers a past/selected instance before today
     await recompute();
   }
 
@@ -161,6 +180,7 @@ export function useDay(date: string, materialize = true) {
     addRecurringTask,
     toggle,
     remove,
+    removeSeries,
     moveToTomorrow,
   };
 }

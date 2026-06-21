@@ -4,11 +4,15 @@ export default function TaskRow({
   task,
   onToggle,
   onRemove,
+  onRemoveSeries,
   onMoveToTomorrow,
 }: {
   task: TaskItem;
   onToggle: () => void;
+  /** Remove from this day only. For a recurring task this also skips that day. */
   onRemove: () => void;
+  /** Remove the whole recurring series (stop repeating). Recurring tasks only. */
+  onRemoveSeries?: () => void;
   onMoveToTomorrow: () => void;
 }) {
   return (
@@ -35,7 +39,7 @@ export default function TaskRow({
           </span>
         )}
       </span>
-      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+      <div className="flex items-center gap-1">
         <button
           onClick={onMoveToTomorrow}
           title="Move to tomorrow"
@@ -46,12 +50,22 @@ export default function TaskRow({
         </button>
         <button
           onClick={onRemove}
-          title="Delete"
-          aria-label={`Delete ${task.name}`}
+          title={task.isRecurring ? 'Remove from this day' : 'Delete'}
+          aria-label={task.isRecurring ? `Remove ${task.name} from this day` : `Delete ${task.name}`}
           className="rounded px-1.5 py-0.5 text-wtd-muted hover:text-wtd-loss"
         >
           ✕
         </button>
+        {task.isRecurring && onRemoveSeries && (
+          <button
+            onClick={onRemoveSeries}
+            title="Stop repeating — remove from all days"
+            aria-label={`Stop repeating ${task.name} and remove from all days`}
+            className="flex items-center gap-0.5 rounded px-2 py-0.5 text-xs font-medium text-wtd-muted hover:bg-wtd-loss/15 hover:text-wtd-loss"
+          >
+            <span className="line-through">↻</span> stop
+          </button>
+        )}
       </div>
     </li>
   );

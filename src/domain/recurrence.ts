@@ -12,6 +12,8 @@ export interface RecurringSpec {
   recurrenceRule: RecurrenceRule;
   winBreaker: boolean;
   isDeleted?: boolean;
+  /** Dates the user removed this recurring task from — never re-materialized. */
+  skipDates?: string[];
 }
 
 /** A recurring instance that should be materialized for a given date. */
@@ -43,6 +45,7 @@ export function recurringInstancesForDate(
   const out: RecurringInstance[] = [];
   for (const r of recurring) {
     if (r.isDeleted) continue;
+    if (r.skipDates?.includes(dateStr)) continue;
     const applies =
       r.recurrenceRule === 'daily' ||
       (r.recurrenceRule === 'workDays' && isWeekday(dateStr));

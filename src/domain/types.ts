@@ -31,6 +31,8 @@ export interface RecurringTaskItem {
   createdOn: string;
   isDeleted: boolean;
   winBreaker: boolean;
+  /** Dates ('yyyy-MM-dd') the user removed this recurring task from — skipped on materialization. */
+  skipDates?: string[];
 }
 
 export interface Result {
