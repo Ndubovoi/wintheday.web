@@ -1,0 +1,17 @@
+/* Tailwind v4 + Win The Day consumer dark theme.
+ * Scoped to the authenticated /app area; the marketing pages keep their own CSS.
+ * Palette mirrors the Flutter app: #121212 background, #00ffaa teal, #66ccff cyan. */
+@import "tailwindcss";
+
+@theme {
+  --color-wtd-bg: #121212;
+  --color-wtd-surface: #1a1a1a;
+  --color-wtd-surface-2: #222222;
+  --color-wtd-border: #2a2a2a;
+  --color-wtd-text: #f5f5f5;
+  --color-wtd-muted: #bbbbbb;
+  --color-wtd-teal: #00ffaa;
+  --color-wtd-cyan: #66ccff;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}

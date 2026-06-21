@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "wintheday-web-emulated",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:emulated"],
+      "port": 5173
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
-import './App.css';
+import './LandingPage.css';
 
-function App() {
+function LandingPage() {
   const aboutRef = useRef<HTMLElement>(null);
   const supportRef = useRef<HTMLElement>(null);
 
@@ -64,4 +64,4 @@ function App() {
   );
 }
 
-export default App;
+export default LandingPage;
