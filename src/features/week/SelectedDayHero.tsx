@@ -1,35 +1,14 @@
-import { useEffect, useRef } from 'react';
 import { format } from 'date-fns';
 import { parseDateStr, todayStr } from '../../domain/dates';
 import { useDay } from '../home/useDay';
 import ProgressCircle from '../home/components/ProgressCircle';
 import TaskComposer from '../home/components/TaskComposer';
 import TaskRow from '../home/components/TaskRow';
-import { celebrate } from '../../shared/confetti';
 
 export default function SelectedDayHero({ date }: { date: string }) {
   const day = useDay(date);
   const isToday = date === todayStr();
   const heading = isToday ? 'Today' : format(parseDateStr(date), 'EEEE');
-
-  // Celebrate only on a real win transition (not when switching to an already-won day).
-  const prevWon = useRef(day.won);
-  const settled = useRef(false);
-  const key = useRef(date);
-  useEffect(() => {
-    if (key.current !== date) {
-      key.current = date;
-      settled.current = false;
-    }
-    if (day.loading) return;
-    if (!settled.current) {
-      settled.current = true;
-      prevWon.current = day.won;
-      return;
-    }
-    if (day.won && !prevWon.current) celebrate();
-    prevWon.current = day.won;
-  }, [day.won, day.loading, date]);
 
   return (
     <section className="rounded-3xl border border-wtd-border bg-wtd-surface p-6 md:p-8">

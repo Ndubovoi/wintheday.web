@@ -25,6 +25,7 @@ import {
   deleteSeriesInstancesFrom,
 } from '../../data/recurring.repo';
 import { updateWinStatusForDate } from '../../data/winStatus';
+import { celebrate } from '../../shared/confetti';
 
 export function useDay(date: string) {
   const { user } = useAuth();
@@ -75,10 +76,13 @@ export function useDay(date: string) {
   const won = useMemo(() => isDayWon(tasks), [tasks]);
 
   // Recompute win status over the merged list (so virtual occurrences count too).
-  async function recompute() {
-    if (!uid) return;
+  // Returns whether the day is won after the recompute.
+  async function recompute(): Promise<boolean> {
+    if (!uid) return false;
     const [real, recs] = await Promise.all([getTasksForDate(uid, date), getRecurring(uid)]);
-    await updateWinStatusForDate(uid, date, displayTasksForDate(real, recs, date));
+    const merged = displayTasksForDate(real, recs, date);
+    await updateWinStatusForDate(uid, date, merged);
+    return isDayWon(merged);
   }
 
   /** Write a virtual recurring occurrence to Firestore so it can hold state. */
@@ -128,9 +132,12 @@ export function useDay(date: string) {
 
   async function toggle(task: TaskItem) {
     if (!uid) return;
+    const wasWon = won;
     if (task.virtual) await materialize(task, !task.completed);
     else await setTaskCompleted(uid, task.id, !task.completed);
-    await recompute();
+    const nowWon = await recompute();
+    // Celebrate only when checking a task off actually wins the day.
+    if (!wasWon && nowWon) celebrate();
   }
 
   /** Remove from this day only. For a recurring task, record a skip date. */
